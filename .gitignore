@@ -1,10 +1,6 @@
 # tmux plugins (each one is its own repo)
 tmux/plugins/
 
-
-
-
-
 ############################
 # OS Garbage
 ############################
@@ -29,14 +25,13 @@ tags
 ############################
 # Backups / old copies (from your tree)
 ############################
-/nvim.backup/
-/nvim.backup.newest/
-/old_nvim/
+nvim.backup/
+nvim.backup.newest/
+old_nvim/
 
 ############################
 # Neovim build/cache noise (keep your actual config)
 ############################
-# (These only ignore common generated bits if you keep them inside the repo)
 nvim/.cache/
 nvim/pack/
 nvim/site/pack/
@@ -47,18 +42,18 @@ nvim/**/node_modules/
 ############################
 # Secrets / tokens / machine-specific state
 ############################
-/github-copilot/           # contains auth/state
-/gh/                       # GitHub CLI: hosts.yml tokens
-/Microsoft\VisualStudio Services/  # Azure DevOps creds & cache
-/azure-datalake-store/     # service creds/state (if present)
+github-copilot/
+gh/
+Microsoft\VisualStudio Services/
+azure-datalake-store/
 
 ############################
 # App-specific state you likely don't want in git
 ############################
-/AVer_eCam/                # vendor app data
-/jgit/                     # tool state/cache
-/graphite/                 # (if just tool cache; keep if you store config here)
-/xbuild/                   # mono/xbuild cache; keep if you're intentionally tracking
+AVer_eCam/
+jgit/
+graphite/
+xbuild/
 
 ############################
 # Raycast (keep config, ignore caches)
@@ -81,3 +76,13 @@ flutter/.pub-cache/
 flutter/.packages
 flutter/.flutter-plugins
 flutter/.flutter-plugins-dependencies
+
+############################
+# Other configs you probably don’t want to track
+############################
+SpecFlow/
+fontforge/
+htop/
+karabiner/
+neofetch/
+skhd/
