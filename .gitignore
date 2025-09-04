@@ -76,3 +76,8 @@ flutter/.pub-cache/
 flutter/.packages
 flutter/.flutter-plugins
 flutter/.flutter-plugins-dependencies
+
+Microsoft\\VisualStudio Services/
+flutter/
+raycast/
+
