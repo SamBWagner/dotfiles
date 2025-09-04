@@ -1,9 +1,19 @@
 # Ignore everything by default
 *
 
-# Keep these dirs and their contents
+# Keep these files/dirs
 !.gitignore
 !README.md
+
+# Unignore the directories themselves *and* all their contents
+!nvim/
 !nvim/**
+
+!tmux/
 !tmux/**
+
+# Ignore tmux plugin manager repos
+tmux/plugins/
+
+!karabiner/
 !karabiner/**
