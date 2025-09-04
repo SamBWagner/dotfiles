@@ -11,9 +11,8 @@
 
 !tmux/
 !tmux/**
-
-# Ignore tmux plugin manager repos
 tmux/plugins/
 
 !karabiner/
 !karabiner/**
+karabiner/automatic_backups
