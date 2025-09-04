@@ -1,87 +1,9 @@
-# tmux plugins (each one is its own repo)
-tmux/plugins/
+# Ignore everything by default
+*
 
-############################
-# OS Garbage
-############################
-.DS_Store
-.AppleDouble
-.LSOverride
-Icon?
-._*
-.Spotlight-V100
-
-############################
-# Editors / temp files
-############################
-*.swp
-*.swo
-*~
-*.tmp
-.netrwhist
-Session.vim
-tags
-
-############################
-# Backups / old copies (from your tree)
-############################
-nvim.backup/
-nvim.backup.newest/
-old_nvim/
-
-############################
-# Neovim build/cache noise (keep your actual config)
-############################
-nvim/.cache/
-nvim/pack/
-nvim/site/pack/
-nvim/plugin/packer_compiled.lua
-nvim/lazy-lock.json
-nvim/**/node_modules/
-
-############################
-# Secrets / tokens / machine-specific state
-############################
-github-copilot/
-gh/
-Microsoft\VisualStudio Services/
-azure-datalake-store/
-
-############################
-# App-specific state you likely don't want in git
-############################
-AVer_eCam/
-jgit/
-graphite/
-xbuild/
-
-############################
-# Raycast (keep config, ignore caches)
-############################
-raycast/**/Cache*/
-raycast/**/Local Storage*/
-raycast/**/IndexedDB*/
-
-############################
-# iTerm2 (keep prefs if you export them; ignore autosaves)
-############################
-iterm2/**/AutoSave*
-iterm2/**/RecentSessions*
-
-############################
-# Flutter (only if you keep flutter stuff here)
-############################
-flutter/.dart_tool/
-flutter/.pub-cache/
-flutter/.packages
-flutter/.flutter-plugins
-flutter/.flutter-plugins-dependencies
-
-Microsoft\\VisualStudio Services/
-flutter/
-raycast/
-SpecFlow/
-fontforge/
-htop/
-iterm2/
-neofetch/
+# Keep these dirs and their contents
+!.gitignore
+!README.md
+!nvim/**
+!tmux/**
+!karabiner/**
