@@ -76,13 +76,3 @@ flutter/.pub-cache/
 flutter/.packages
 flutter/.flutter-plugins
 flutter/.flutter-plugins-dependencies
-
-############################
-# Other configs you probably don’t want to track
-############################
-SpecFlow/
-fontforge/
-htop/
-karabiner/
-neofetch/
-skhd/
