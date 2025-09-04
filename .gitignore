@@ -1,142 +1,83 @@
-# Could just force-add these files and leave this as '*', but this way I have a
-# nice explicit list for documentation's sake.
+# tmux plugins (each one is its own repo)
+tmux/plugins/
 
-# Ignore everything by default.
-*
 
-# Bash stuff (profile just sources bashrc, since it's the only thing sourced
-# when a shell is a login shell).
-!.bash*
-.*.swp
-.bash_history
-.bash_local
-.bash_logout
-!.profile
 
-# Zsh
-!.zshrc
-!.zsh
-!.zsh/*
-!.zsh/contrib
-!.zsh/contrib/*
-# Do ignore the data directory (my construct, it's where completion cache,
-# history etc live)
-.zsh/data
-.zsh/data/*
-# Do ignore local/sensitive settings
-.zsh/*local
-# Swapfiles (sigh)
-.zsh/*.swp
 
-# Git aliases, identification info
-!.gitconfig
-# The gitignore of this repository itself (!)
-!.gitignore
-# My global Git excludes file (acts as a global .gitignore)
-!.gitexcludes
 
-# Mercurial config (yup, stored in a Git repository. Take that, hg!)
-!.hgrc
+############################
+# OS Garbage
+############################
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.Spotlight-V100
 
-# IPython config (need directory here so gitignore works correctly.
-# This won't actually pull in the other contetns of the dir, though.
-# Which is good as all I care about is the...
-!.ipython
-# ...default profile's...
-!.ipython/profile_default
-# ...main config file
-!.ipython/profile_default/ipython_config.py
+############################
+# Editors / temp files
+############################
+*.swp
+*.swo
+*~
+*.tmp
+.netrwhist
+Session.vim
+tags
 
-# Virtualenvwrapper hooks
-!.virtualenvs
-!.virtualenvs/postmkvirtualenv
+############################
+# Backups / old copies (from your tree)
+############################
+/nvim.backup/
+/nvim.backup.newest/
+/old_nvim/
 
-# IRb config
-!.irbrc
-# RVM config
-!.rvmrc
+############################
+# Neovim build/cache noise (keep your actual config)
+############################
+# (These only ignore common generated bits if you keep them inside the repo)
+nvim/.cache/
+nvim/pack/
+nvim/site/pack/
+nvim/plugin/packer_compiled.lua
+nvim/lazy-lock.json
+nvim/**/node_modules/
 
-# Vim plugins, ftplugins, syntax etc etc
-!.vim
-!.vim/*
-!.vim/*/*
-!.vim/*/*/*
-!.vim/*/*/*/*
-!.vim/*/*/*/*/*
-!.vim/*/*/*/*/*/*
-# Do ignore netrw history
-.vim/.netrwhist
-# Do ignore vim-plug stuff, sigh
-.vim/plugged
-# Vim settings
-!.vimrc
-# Ignore swapfiles
-.vim/.*.swp
-.vim/*/.*.swp
-.vim/*/*/.*.swp
-.vim/*/*/*/.*.swp
+############################
+# Secrets / tokens / machine-specific state
+############################
+/github-copilot/           # contains auth/state
+/gh/                       # GitHub CLI: hosts.yml tokens
+/Microsoft\VisualStudio Services/  # Azure DevOps creds & cache
+/azure-datalake-store/     # service creds/state (if present)
 
-# Local copies of tools/scripts
-!bin
-!bin/*
-bin/.*.swp
-# Concourse CLI; changes depending on target version
-bin/fly
+############################
+# App-specific state you likely don't want in git
+############################
+/AVer_eCam/                # vendor app data
+/jgit/                     # tool state/cache
+/graphite/                 # (if just tool cache; keep if you store config here)
+/xbuild/                   # mono/xbuild cache; keep if you're intentionally tracking
 
-# Config for local daemons (e.g. squid)
-!etc
-!etc/*
-etc/clusto*.conf
+############################
+# Raycast (keep config, ignore caches)
+############################
+raycast/**/Cache*/
+raycast/**/Local Storage*/
+raycast/**/IndexedDB*/
 
-# Screen, tmux
-!.screenrc
-!.tmux.conf
-!.tmux
-!.tmux/*.yml
+############################
+# iTerm2 (keep prefs if you export them; ignore autosaves)
+############################
+iterm2/**/AutoSave*
+iterm2/**/RecentSessions*
 
-# Gem config
-!.gemrc
-
-# Mutt
-!.muttrc
-!.mutt
-!.mutt/*
-
-# RTorrent
-!.rtorrent.rc
-
-# Ack
-!.ackrc
-
-# Teamocil
-!.teamocil
-!.teamocil/*
-
-# Synergy
-!.synergy.conf
-
-# Leiningen (Clojure)
-!.lein
-!.lein/profiles.clj
-
-# Hammerspoon (Lua-based OS X automation tool)
-!.hammerspoon
-!.hammerspoon/*
-.hammerspoon/.*.swp
-
-# Linux workstation stuff
-!.config
-!.config/xfce4
-!.config/xfce4/terminal
-!.config/xfce4/terminal/terminalrc
-
-# Random arbitrary not-really-a-config file,
-# for use with hexdump
-!.config/hexdump.format
-
-Microsoft/
-gh/
-xbuild/
-SpecFlow/
-iterm2/
-flutter/
+############################
+# Flutter (only if you keep flutter stuff here)
+############################
+flutter/.dart_tool/
+flutter/.pub-cache/
+flutter/.packages
+flutter/.flutter-plugins
+flutter/.flutter-plugins-dependencies
