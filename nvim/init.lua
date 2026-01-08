@@ -1,25 +1,21 @@
--- Basic
 vim.g.mapleader = " "
+
 vim.o.wrap = false
 
--- Indentation
 vim.o.tabstop = 4
 vim.o.shiftwidth = 4
 vim.o.softtabstop = 4
 vim.o.expandtab = true
 vim.o.smartindent = true
 
--- Search
 vim.o.hlsearch = false
 vim.o.incsearch = true
 
--- Visual
 vim.o.scrolloff = 10
 vim.o.signcolumn = "yes"
-vim.o.syntax = on
 vim.o.colorcolumn = "80"
 vim.o.showtabline = 0
-vim.opt.laststatus = 0
+vim.o.laststatus = 0
 
 vim.diagnostic.config({
     signs = {
@@ -33,28 +29,12 @@ vim.diagnostic.config({
     virtual_text = true,
 })
 
--- LSP
-vim.lsp.enable('lua_ls')
-vim.lsp.enable('gopls')
-vim.lsp.enable('html')
-vim.lsp.enable('ts_ls')
-vim.lsp.enable('easy-dotnet')
-vim.lsp.enable('bashls')
-vim.lsp.enable('astro-language-server')
-vim.lsp.enable('prettier')
-vim.lsp.enable('markdown-oxide')
-vim.lsp.enable('nextls')
-vim.lsp.enable('rust-analyzer')
-
--- File handling
 vim.o.backup = false
 vim.o.swapfile = false
 vim.o.undofile = true
 vim.o.undodir = os.getenv("HOME") .. "/.vim/undodir"
 vim.o.updatetime = 50
-vim.o.filetype = "on"
 
--- Autocommands
 vim.api.nvim_create_autocmd("FileType", {
     pattern = { "javascript", "typescript", "javascriptreact", "typescriptreact" },
     callback = function()
@@ -64,104 +44,62 @@ vim.api.nvim_create_autocmd("FileType", {
     end,
 })
 
--- Packages
 vim.pack.add({
-    -- colorscheme
     { src = "https://github.com/sainnhe/sonokai" },
-    -- Terminal within Vim
     { src = "https://github.com/akinsho/toggleterm.nvim" },
-    -- Parser
     { src = "https://github.com/nvim-treesitter/nvim-treesitter" },
-    -- Fuzzy finder
     { src = "https://github.com/nvim-telescope/telescope.nvim" },
-    -- LSP
+    { src = "https://github.com/nvim-lua/plenary.nvim" },
     { src = "https://github.com/neovim/nvim-lspconfig" },
-    { src = "https://github.com/mason-org/mason.nvim" },
-    { src = "https://github.com/mason-org/mason-lspconfig.nvim" },
+    { src = "https://github.com/williamboman/mason.nvim" },
+    { src = "https://github.com/williamboman/mason-lspconfig.nvim" },
     { src = "https://github.com/j-hui/fidget.nvim" },
-    -- Autocomplete
     { src = "https://github.com/hrsh7th/cmp-nvim-lsp" },
     { src = "https://github.com/hrsh7th/cmp-buffer" },
     { src = "https://github.com/hrsh7th/cmp-path" },
     { src = "https://github.com/hrsh7th/nvim-cmp" },
-
-    -- indent guide
     { src = "https://github.com/lukas-reineke/indent-blankline.nvim" },
-
-    -- Something???
-    { src = "https://github.com/nvim-lua/plenary.nvim" },
-
-    -- C# support
-    { src = "https://github.com/GustavEikaas/easy-dotnet.nvim" }
+    { src = "https://github.com/GustavEikaas/easy-dotnet.nvim" },
+    { src = "https://github.com/lewis6991/gitsigns.nvim" },
 })
 
--- Colorscheme
-vim.cmd.colorscheme("sonokai")
-
--- Transparent background support
-vim.api.nvim_set_hl(0, "Normal", { bg = "NONE" })
-vim.api.nvim_set_hl(0, "NormalFloat", { bg = "NONE" })
-vim.api.nvim_set_hl(0, "SignColumn", { bg = "NONE" })
-vim.api.nvim_set_hl(0, "NormalNC", { bg = "NONE" })
-
--- C#
-require("easy-dotnet").setup()
+vim.lsp.enable("lua_ls")
+vim.lsp.enable("ts_ls")
+vim.lsp.enable("html")
+vim.lsp.enable("cssls")
 
 require("fidget").setup()
 require("mason").setup()
-require("mason-lspconfig").setup()
-local cmp = require("cmp")
-local treesitter = require("nvim-treesitter.configs")
-local _, toggleterm = pcall(require, "toggleterm")
+require("mason-lspconfig").setup({
+    ensure_installed = { "lua_ls", "ts_ls", "html", "cssls" },
+    automatic_installation = true,
+})
 
--- Keymaps
--- Telescope
-local telescope_builtin = require("telescope.builtin")
+require("easy-dotnet").setup()
 
-vim.keymap.set("n", "<leader>ff", function()
-    require("telescope.builtin").find_files({
-        path_display = { "filename_first" },
-        follow = true,
-    })
-end)
-vim.keymap.set("n", "<leader>fa", function()
-    telescope_builtin.live_grep({
-        path_display = { "filename_first" },
-        follow = true,
-    })
-end)
+require("nvim-treesitter.configs").setup({
+    sync_install = false,
+    auto_install = true,
+    highlight = {
+        enable = true,
+        additional_vim_regex_highlighting = false,
+    },
+})
 
--- LSP
-vim.keymap.set("n", "grd", vim.lsp.buf.definition, opts) -- go to definition
-vim.keymap.set("n", "<leader>lf", vim.lsp.buf.format)    -- format code using LSP
-vim.keymap.set("n", "K", function()                      -- lsp hover
-    vim.lsp.buf.hover({
-        border = "rounded",
-    })
-end)
-vim.keymap.set("n", "gdi", vim.diagnostic.open_float, opts) -- diagnostics
-vim.keymap.set("n", "gca", vim.lsp.buf.code_action, opts)   -- code actions
-vim.keymap.set('n', "grr", function()
-    telescope_builtin.lsp_references();
-end)
-vim.keymap.set("n", "grn", vim.lsp.buf.rename, opts)           -- rename
-vim.keymap.set("i", "<C-h>", vim.lsp.buf.signature_help, opts) -- signature help
+require("ibl").setup()
 
--- General
-vim.keymap.set("n", "<leader>ex", vim.cmd.Ex)                                            -- open file explorer
+require("gitsigns").setup({
+    signs = {
+        add          = { text = "+" },
+        change       = { text = "~" },
+        delete       = { text = "_" },
+        topdelete    = { text = "‾" },
+        changedelete = { text = "~" },
+    },
+    current_line_blame = false,
+})
 
-vim.keymap.set("n", "<C-d>", "<C-d>zz")                                                  -- scroll down
-vim.keymap.set("n", "<C-u>", "<C-u>zz")                                                  -- scroll down
-vim.keymap.set("n", "n", "nzzzv")                                                        -- search next and center
-vim.keymap.set("n", "N", "Nzzzv")                                                        -- search previous and center
-vim.keymap.set({ "n", "v" }, "<leader>y", [["+y]])                                       -- copy (line) to system clipboard
-vim.keymap.set("n", "Q", "<nop>")                                                        -- disable Q
-vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]]) -- search and replace current word
-vim.keymap.set("v", "<", "<gv")                                                          -- stay in visual mode when indenting left
-vim.keymap.set("v", ">", ">gv")                                                          -- stay in visual mode when indenting right
-
--- Plugin config
-toggleterm.setup({
+require("toggleterm").setup({
     size = 20,
     open_mapping = [[<c-\>]],
     hide_numbers = true,
@@ -184,20 +122,8 @@ toggleterm.setup({
     },
 })
 
-treesitter.setup({
-    sync_install = false,
-    auto_install = true,
-    highlight = {
-        enable = true,
-        additional_vim_regex_highlighting = false,
-    },
-})
-
--- indenting
-local indentGuide = require("ibl")
-indentGuide.setup();
-
-cmp.setup({
+local completion = require("cmp")
+completion.setup({
     snippet = {
         expand = function(args)
             vim.snippet.expand(args.body)
@@ -211,28 +137,85 @@ cmp.setup({
             winhighlight = "Normal:Pmenu,FloatBorder:Pmenu,Search:None",
         },
     },
-    mapping = cmp.mapping.preset.insert({
-        ['<Tab>'] = cmp.mapping(function(fallback)
-            if cmp.visible() then
-                cmp.select_next_item()
+    mapping = completion.mapping.preset.insert({
+        ["<Tab>"] = completion.mapping(function(fallback)
+            if completion.visible() then
+                completion.select_next_item()
             else
                 fallback()
             end
-        end, { 'i', 's' }),
+        end, { "i", "s" }),
 
-        ['<S-Tab>'] = cmp.mapping(function(fallback)
-            if cmp.visible() then
-                cmp.select_prev_item()
+        ["<S-Tab>"] = completion.mapping(function(fallback)
+            if completion.visible() then
+                completion.select_prev_item()
             else
                 fallback()
             end
-        end, { 'i', 's' }),
+        end, { "i", "s" }),
 
-        ['<CR>'] = cmp.mapping.confirm({ select = true }),
+        ["<CR>"] = completion.mapping.confirm({ select = true }),
     }),
-    sources = cmp.config.sources({
+    sources = completion.config.sources({
         { name = "nvim_lsp" },
     }, {
         { name = "buffer" },
     })
 })
+
+local telescope = require("telescope.builtin")
+
+vim.keymap.set("n", "<leader>ff", function()
+    telescope.find_files({
+        path_display = { "filename_first" },
+        follow = true,
+    })
+end)
+
+vim.keymap.set("n", "<leader>fa", function()
+    telescope.live_grep({
+        path_display = { "filename_first" },
+        follow = true,
+    })
+end)
+
+vim.keymap.set("n", "grd", vim.lsp.buf.definition)
+vim.keymap.set("n", "grr", telescope.lsp_references)
+vim.keymap.set("n", "grn", vim.lsp.buf.rename)
+vim.keymap.set("n", "gca", vim.lsp.buf.code_action)
+vim.keymap.set("n", "gdi", vim.diagnostic.open_float)
+vim.keymap.set("n", "<leader>lf", vim.lsp.buf.format)
+vim.keymap.set("n", "K", function()
+    vim.lsp.buf.hover({
+        border = "rounded",
+    })
+end)
+vim.keymap.set("i", "<C-h>", vim.lsp.buf.signature_help)
+
+local gitsigns = require("gitsigns")
+
+vim.keymap.set("n", "<leader>gp", gitsigns.preview_hunk)
+vim.keymap.set("n", "<leader>gs", gitsigns.stage_hunk)
+vim.keymap.set("n", "<leader>gu", gitsigns.undo_stage_hunk)
+vim.keymap.set("n", "<leader>gr", gitsigns.reset_hunk)
+vim.keymap.set("n", "<leader>gb", gitsigns.toggle_current_line_blame)
+vim.keymap.set("n", "[c", gitsigns.prev_hunk)
+vim.keymap.set("n", "]c", gitsigns.next_hunk)
+
+vim.keymap.set("n", "<leader>ex", vim.cmd.Ex)
+vim.keymap.set("n", "<C-d>", "<C-d>zz")
+vim.keymap.set("n", "<C-u>", "<C-u>zz")
+vim.keymap.set("n", "n", "nzzzv")
+vim.keymap.set("n", "N", "Nzzzv")
+vim.keymap.set({ "n", "v" }, "<leader>y", [["+y]])
+vim.keymap.set("n", "Q", "<nop>")
+vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
+vim.keymap.set("v", "<", "<gv")
+vim.keymap.set("v", ">", ">gv")
+
+vim.cmd.colorscheme("sonokai")
+
+vim.api.nvim_set_hl(0, "Normal", { bg = "NONE" })
+vim.api.nvim_set_hl(0, "NormalFloat", { bg = "NONE" })
+vim.api.nvim_set_hl(0, "SignColumn", { bg = "NONE" })
+vim.api.nvim_set_hl(0, "NormalNC", { bg = "NONE" })
