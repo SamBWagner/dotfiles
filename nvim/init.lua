@@ -122,6 +122,20 @@ require("toggleterm").setup({
     },
 })
 
+local Terminal = require("toggleterm.terminal").Terminal
+local lazygit = Terminal:new({
+    cmd = "lazygit",
+    direction = "float",
+    float_opts = {
+        border = "curved",
+    },
+    hidden = true,
+})
+
+vim.keymap.set("n", "<leader>gg", function()
+    lazygit:toggle()
+end, { desc = "Toggle Lazygit" })
+
 local completion = require("cmp")
 completion.setup({
     snippet = {
