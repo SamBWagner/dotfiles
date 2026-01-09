@@ -179,6 +179,14 @@ completion.setup({
 
 local telescope = require("telescope.builtin")
 
+local function get_visual_selection()
+    vim.cmd('noau normal! "vy')
+    local text = vim.fn.getreg("v")
+    vim.fn.setreg("v", {})
+    text = string.gsub(text, "\n", "")
+    return text
+end
+
 vim.keymap.set("n", "<leader>ff", function()
     telescope.find_files({
         path_display = { "filename_first" },
@@ -186,10 +194,28 @@ vim.keymap.set("n", "<leader>ff", function()
     })
 end)
 
+vim.keymap.set("v", "<leader>ff", function()
+    local text = get_visual_selection()
+    telescope.find_files({
+        path_display = { "filename_first" },
+        follow = true,
+        default_text = text,
+    })
+end)
+
 vim.keymap.set("n", "<leader>fa", function()
     telescope.live_grep({
         path_display = { "filename_first" },
         follow = true,
+    })
+end)
+
+vim.keymap.set("v", "<leader>fa", function()
+    local text = get_visual_selection()
+    telescope.live_grep({
+        path_display = { "filename_first" },
+        follow = true,
+        default_text = text,
     })
 end)
 
