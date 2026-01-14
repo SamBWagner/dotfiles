@@ -136,6 +136,37 @@ vim.keymap.set("n", "<leader>gg", function()
     lazygit:toggle()
 end, { desc = "Toggle Lazygit" })
 
+local opencode = Terminal:new({
+    cmd = "opencode",
+    dir = vim.fn.getcwd(),
+    direction = "float",
+    float_opts = {
+        border = "curved",
+    },
+    hidden = true,
+})
+
+vim.keymap.set("n", "<leader>ai", function()
+    opencode:toggle()
+end, { desc = "Toggle OpenCode" })
+
+vim.keymap.set("n", "<leader>md", function()
+    local file = vim.fn.expand("%:p")
+    if vim.bo.filetype ~= "markdown" then
+        vim.notify("Not a markdown file", vim.log.levels.WARN)
+        return
+    end
+    local glow = Terminal:new({
+        cmd = "glow " .. vim.fn.shellescape(file) .. " -p",
+        direction = "float",
+        float_opts = {
+            border = "curved",
+        },
+        close_on_exit = true,
+    })
+    glow:toggle()
+end, { desc = "Preview markdown with glow" })
+
 local completion = require("cmp")
 completion.setup({
     snippet = {
@@ -234,7 +265,129 @@ vim.keymap.set("i", "<C-h>", vim.lsp.buf.signature_help)
 
 local gitsigns = require("gitsigns")
 
-vim.keymap.set("n", "<leader>gp", gitsigns.preview_hunk)
+-- Stateful git changed file navigation
+local git_nav = {
+    index = 0,
+    files = {},
+    last_refresh = 0,
+}
+
+local function get_git_changed_files()
+    -- Get git root directory
+    local root_handle = io.popen("git rev-parse --show-toplevel 2>/dev/null")
+    if not root_handle then return {} end
+    local git_root = root_handle:read("*l")
+    root_handle:close()
+    if not git_root or git_root == "" then return {} end
+
+    local handle = io.popen("git status --porcelain 2>/dev/null")
+    if not handle then return {} end
+    local result = handle:read("*a")
+    handle:close()
+
+    local files = {}
+    for line in result:gmatch("[^\r\n]+") do
+        -- Extract filename (skip the 2-char status + space)
+        local file = line:sub(4)
+        -- Handle renamed files (old -> new)
+        local arrow_pos = file:find(" -> ")
+        if arrow_pos then
+            file = file:sub(arrow_pos + 4)
+        end
+        if file ~= "" then
+            -- Convert to absolute path using git root
+            local abs_path = git_root .. "/" .. file
+            table.insert(files, abs_path)
+        end
+    end
+    return files
+end
+
+local function git_nav_next()
+    local files = get_git_changed_files()
+    if #files == 0 then
+        vim.notify("No git changes found", vim.log.levels.INFO)
+        return
+    end
+
+    -- Check if file list changed; if so, try to preserve position
+    local files_changed = #files ~= #git_nav.files
+    if not files_changed then
+        for i, f in ipairs(files) do
+            if git_nav.files[i] ~= f then
+                files_changed = true
+                break
+            end
+        end
+    end
+
+    if files_changed then
+        -- Try to find current file in new list to maintain context
+        local current_file = vim.fn.expand("%:p")
+        local found_idx = 0
+        for i, f in ipairs(files) do
+            if f == current_file then
+                found_idx = i
+                break
+            end
+        end
+        git_nav.files = files
+        git_nav.index = found_idx
+    end
+
+    -- Move to next file
+    git_nav.index = git_nav.index + 1
+    if git_nav.index > #files then
+        git_nav.index = 1
+    end
+
+    local target = files[git_nav.index]
+    vim.cmd("edit " .. vim.fn.fnameescape(target))
+    vim.notify(string.format("[%d/%d] %s", git_nav.index, #files, vim.fn.fnamemodify(target, ":~:.")), vim.log.levels.INFO)
+end
+
+local function git_nav_prev()
+    local files = get_git_changed_files()
+    if #files == 0 then
+        vim.notify("No git changes found", vim.log.levels.INFO)
+        return
+    end
+
+    local files_changed = #files ~= #git_nav.files
+    if not files_changed then
+        for i, f in ipairs(files) do
+            if git_nav.files[i] ~= f then
+                files_changed = true
+                break
+            end
+        end
+    end
+
+    if files_changed then
+        local current_file = vim.fn.expand("%:p")
+        local found_idx = 0
+        for i, f in ipairs(files) do
+            if f == current_file then
+                found_idx = i
+                break
+            end
+        end
+        git_nav.files = files
+        git_nav.index = found_idx
+    end
+
+    git_nav.index = git_nav.index - 1
+    if git_nav.index < 1 then
+        git_nav.index = #files
+    end
+
+    local target = files[git_nav.index]
+    vim.cmd("edit " .. vim.fn.fnameescape(target))
+    vim.notify(string.format("[%d/%d] %s", git_nav.index, #files, vim.fn.fnamemodify(target, ":~:.")), vim.log.levels.INFO)
+end
+
+vim.keymap.set("n", "<leader>gn", git_nav_next, { desc = "Next git changed file" })
+vim.keymap.set("n", "<leader>gp", git_nav_prev, { desc = "Previous git changed file" })
 vim.keymap.set("n", "<leader>gs", gitsigns.stage_hunk)
 vim.keymap.set("n", "<leader>gu", gitsigns.undo_stage_hunk)
 vim.keymap.set("n", "<leader>gr", gitsigns.reset_hunk)
