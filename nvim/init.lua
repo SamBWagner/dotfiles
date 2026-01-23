@@ -61,6 +61,8 @@ vim.pack.add({
     { src = "https://github.com/lukas-reineke/indent-blankline.nvim" },
     { src = "https://github.com/GustavEikaas/easy-dotnet.nvim" },
     { src = "https://github.com/lewis6991/gitsigns.nvim" },
+    { src = "https://github.com/tpope/vim-fugitive" },
+    { src = "https://github.com/folke/which-key.nvim" },
 })
 
 vim.lsp.enable("lua_ls")
@@ -97,6 +99,18 @@ require("gitsigns").setup({
         changedelete = { text = "~" },
     },
     current_line_blame = false,
+})
+
+require("which-key").setup({
+    preset = "modern",
+    delay = 400,
+    win = {
+        border = "rounded",
+        padding = { 1, 2 },
+    },
+    layout = {
+        align = "center",
+    },
 })
 
 require("toggleterm").setup({
@@ -223,7 +237,7 @@ vim.keymap.set("n", "<leader>ff", function()
         path_display = { "filename_first" },
         follow = true,
     })
-end)
+end, { desc = "Find files" })
 
 vim.keymap.set("v", "<leader>ff", function()
     local text = get_visual_selection()
@@ -232,14 +246,32 @@ vim.keymap.set("v", "<leader>ff", function()
         follow = true,
         default_text = text,
     })
-end)
+end, { desc = "Find files" })
+
+vim.keymap.set("n", "<leader>fh", function()
+    telescope.find_files({
+        path_display = { "filename_first" },
+        follow = true,
+        hidden = true,
+    })
+end, { desc = "Find files (hidden included)" })
+
+vim.keymap.set("v", "<leader>fh", function()
+    local text = get_visual_selection()
+    telescope.find_files({
+        path_display = { "filename_first" },
+        follow = true,
+        hidden = true,
+        default_text = text,
+    })
+end, { desc = "Find files (hidden included)" })
 
 vim.keymap.set("n", "<leader>fa", function()
     telescope.live_grep({
         path_display = { "filename_first" },
         follow = true,
     })
-end)
+end, { desc = "Find in all files (grep)" })
 
 vim.keymap.set("v", "<leader>fa", function()
     local text = get_visual_selection()
@@ -248,20 +280,28 @@ vim.keymap.set("v", "<leader>fa", function()
         follow = true,
         default_text = text,
     })
-end)
+end, { desc = "Find in all files (grep)" })
 
-vim.keymap.set("n", "grd", vim.lsp.buf.definition)
-vim.keymap.set("n", "grr", telescope.lsp_references)
-vim.keymap.set("n", "grn", vim.lsp.buf.rename)
-vim.keymap.set("n", "gca", vim.lsp.buf.code_action)
-vim.keymap.set("n", "gdi", vim.diagnostic.open_float)
-vim.keymap.set("n", "<leader>lf", vim.lsp.buf.format)
+vim.keymap.set("n", "grd", vim.lsp.buf.definition, { desc = "Go to definition" })
+vim.keymap.set("n", "grr", telescope.lsp_references, { desc = "Go to references" })
+vim.keymap.set("n", "grn", vim.lsp.buf.rename, { desc = "Rename symbol" })
+vim.keymap.set("n", "gca", vim.lsp.buf.code_action, { desc = "Code action" })
+vim.keymap.set("n", "gdi", vim.diagnostic.open_float, { desc = "Show diagnostic" })
+vim.keymap.set("n", "<leader>lf", function()
+    if vim.bo.filetype == "cs" then
+        local file = vim.fn.expand("%:p")
+        vim.cmd("!" .. "dotnet csharpier " .. vim.fn.shellescape(file))
+        vim.cmd("edit!")
+    else
+        vim.lsp.buf.format()
+    end
+end, { desc = "Format buffer" })
 vim.keymap.set("n", "K", function()
     vim.lsp.buf.hover({
         border = "rounded",
     })
-end)
-vim.keymap.set("i", "<C-h>", vim.lsp.buf.signature_help)
+end, { desc = "Hover documentation" })
+-- Signature help is now handled by lsp_signature.nvim (auto-triggers on typing)
 
 local gitsigns = require("gitsigns")
 
@@ -388,23 +428,75 @@ end
 
 vim.keymap.set("n", "<leader>gn", git_nav_next, { desc = "Next git changed file" })
 vim.keymap.set("n", "<leader>gp", git_nav_prev, { desc = "Previous git changed file" })
-vim.keymap.set("n", "<leader>gs", gitsigns.stage_hunk)
-vim.keymap.set("n", "<leader>gu", gitsigns.undo_stage_hunk)
-vim.keymap.set("n", "<leader>gr", gitsigns.reset_hunk)
-vim.keymap.set("n", "<leader>gb", gitsigns.toggle_current_line_blame)
-vim.keymap.set("n", "[c", gitsigns.prev_hunk)
-vim.keymap.set("n", "]c", gitsigns.next_hunk)
+vim.keymap.set("n", "<leader>gs", gitsigns.stage_hunk, { desc = "Stage hunk" })
+vim.keymap.set("n", "<leader>gu", gitsigns.undo_stage_hunk, { desc = "Undo stage hunk" })
+vim.keymap.set("n", "<leader>gr", gitsigns.reset_hunk, { desc = "Reset hunk" })
+vim.keymap.set("n", "<leader>gb", gitsigns.toggle_current_line_blame, { desc = "Toggle line blame" })
+vim.keymap.set("n", "[c", gitsigns.prev_hunk, { desc = "Previous hunk" })
+vim.keymap.set("n", "]c", gitsigns.next_hunk, { desc = "Next hunk" })
 
-vim.keymap.set("n", "<leader>ex", vim.cmd.Ex)
-vim.keymap.set("n", "<C-d>", "<C-d>zz")
-vim.keymap.set("n", "<C-u>", "<C-u>zz")
-vim.keymap.set("n", "n", "nzzzv")
-vim.keymap.set("n", "N", "Nzzzv")
-vim.keymap.set({ "n", "v" }, "<leader>y", [["+y]])
-vim.keymap.set("n", "Q", "<nop>")
-vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
-vim.keymap.set("v", "<", "<gv")
-vim.keymap.set("v", ">", ">gv")
+-- Fugitive keybindings for VSCode/Rider-like git experience
+vim.keymap.set("n", "<leader>gc", "<cmd>Git commit<CR>", { desc = "Git commit" })
+vim.keymap.set("n", "<leader>gl", "<cmd>Git log --oneline<CR>", { desc = "Git log" })
+vim.keymap.set("n", "<leader>gd", "<cmd>Gvdiffsplit<CR>", { desc = "Git diff current file" })
+vim.keymap.set("n", "<leader>gh", function()
+    -- Open commit history in a split that's easy to navigate
+    vim.cmd("Git log --oneline --graph --decorate --all")
+end, { desc = "Git history (graph)" })
+vim.keymap.set("n", "<leader>gv", function()
+    -- Open fugitive status window (like VSCode's source control panel)
+    vim.cmd("Git")
+end, { desc = "Git status" })
+
+-- In the git log buffer, you can press Enter on a commit to view it
+-- or 'o' to view the commit in a split
+vim.api.nvim_create_autocmd("FileType", {
+    pattern = "fugitive",
+    callback = function()
+        local opts = { buffer = true }
+        -- Navigate between files in the fugitive status window
+        vim.keymap.set("n", "<Tab>", "=", opts)
+        -- Stage/unstage files with 's' and 'u' (already default in fugitive)
+        -- View diff with 'dv'
+        vim.keymap.set("n", "dv", "<cmd>Gvdiffsplit<CR>", opts)
+    end,
+})
+
+-- For git log buffers, make it easy to view commits
+vim.api.nvim_create_autocmd("FileType", {
+    pattern = "git",
+    callback = function()
+        local opts = { buffer = true }
+        -- Extract commit hash from current line and diff it
+        vim.keymap.set("n", "gd", function()
+            local line = vim.api.nvim_get_current_line()
+            local commit = line:match("^%*?%s*([a-f0-9]+)")
+            if commit then
+                vim.cmd("Git diff " .. commit .. "^.." .. commit)
+            end
+        end, { buffer = true, desc = "Diff this commit" })
+        
+        -- View the commit details
+        vim.keymap.set("n", "<CR>", function()
+            local line = vim.api.nvim_get_current_line()
+            local commit = line:match("^%*?%s*([a-f0-9]+)")
+            if commit then
+                vim.cmd("Git show " .. commit)
+            end
+        end, { buffer = true, desc = "Show commit" })
+    end,
+})
+
+vim.keymap.set("n", "<leader>ex", vim.cmd.Ex, { desc = "File explorer" })
+vim.keymap.set("n", "<C-d>", "<C-d>zz", { desc = "Scroll down (centered)" })
+vim.keymap.set("n", "<C-u>", "<C-u>zz", { desc = "Scroll up (centered)" })
+vim.keymap.set("n", "n", "nzzzv", { desc = "Next search result (centered)" })
+vim.keymap.set("n", "N", "Nzzzv", { desc = "Previous search result (centered)" })
+vim.keymap.set({ "n", "v" }, "<leader>y", [["+y]], { desc = "Yank to clipboard" })
+vim.keymap.set("n", "Q", "<nop>", { desc = "Disable Ex mode" })
+vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]], { desc = "Substitute word under cursor" })
+vim.keymap.set("v", "<", "<gv", { desc = "Indent left (keep selection)" })
+vim.keymap.set("v", ">", ">gv", { desc = "Indent right (keep selection)" })
 
 vim.cmd.colorscheme("sonokai")
 
@@ -412,3 +504,43 @@ vim.api.nvim_set_hl(0, "Normal", { bg = "NONE" })
 vim.api.nvim_set_hl(0, "NormalFloat", { bg = "NONE" })
 vim.api.nvim_set_hl(0, "SignColumn", { bg = "NONE" })
 vim.api.nvim_set_hl(0, "NormalNC", { bg = "NONE" })
+
+-- Register which-key groups for organized keybinding discovery
+local wk = require("which-key")
+wk.add({
+    -- Leader key groups
+    { "<leader>f", group = "Find" },
+    { "<leader>g", group = "Git" },
+    { "<leader>l", group = "LSP" },
+    { "<leader>a", group = "AI" },
+    { "<leader>m", group = "Markdown" },
+    { "<leader>e", group = "Explorer" },
+    
+    -- Git subgroups
+    { "<leader>gc", desc = "Commit" },
+    { "<leader>gd", desc = "Diff current file" },
+    { "<leader>gg", desc = "Lazygit" },
+    { "<leader>gh", desc = "History (graph)" },
+    { "<leader>gl", desc = "Log" },
+    { "<leader>gv", desc = "Status" },
+    { "<leader>gn", desc = "Next changed file" },
+    { "<leader>gp", desc = "Previous changed file" },
+    { "<leader>gs", desc = "Stage hunk" },
+    { "<leader>gu", desc = "Undo stage hunk" },
+    { "<leader>gr", desc = "Reset hunk" },
+    { "<leader>gb", desc = "Toggle blame" },
+    
+    -- LSP groups (gr* and gc* prefixes)
+    { "gr", group = "Go to/Refactor" },
+    { "grd", desc = "Definition" },
+    { "grr", desc = "References" },
+    { "grn", desc = "Rename" },
+    { "gc", group = "Code" },
+    { "gca", desc = "Code action" },
+    { "gd", group = "Diagnostics" },
+    { "gdi", desc = "Show diagnostic" },
+    
+    -- Hunk navigation
+    { "[c", desc = "Previous hunk" },
+    { "]c", desc = "Next hunk" },
+})
