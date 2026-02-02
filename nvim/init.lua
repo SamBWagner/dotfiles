@@ -44,6 +44,13 @@ vim.api.nvim_create_autocmd("FileType", {
     end,
 })
 
+vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+    pattern = { "*.bicep", "*.bicepparam" },
+    callback = function()
+        vim.bo.filetype = "bicep"
+    end,
+})
+
 vim.api.nvim_create_autocmd("FileType", {
     pattern = "markdown",
     callback = function(event)
@@ -124,11 +131,12 @@ vim.lsp.enable("lua_ls")
 vim.lsp.enable("ts_ls")
 vim.lsp.enable("html")
 vim.lsp.enable("cssls")
+vim.lsp.enable("bicep")
 
 require("fidget").setup()
 require("mason").setup()
 require("mason-lspconfig").setup({
-    ensure_installed = { "lua_ls", "ts_ls", "html", "cssls" },
+    ensure_installed = { "lua_ls", "ts_ls", "html", "cssls", "bicep" },
     automatic_installation = true,
 })
 
