@@ -212,18 +212,24 @@ require("toggleterm").setup({
 })
 
 local TerminalClass = require("toggleterm.terminal").Terminal
-local lazygit_terminal = TerminalClass:new({
-    cmd = "lazygit",
-    direction = "float",
-    float_opts = {
-        border = "curved",
-    },
-    hidden = true,
-})
 
 vim.keymap.set("n", "<leader>gg", function()
-    lazygit_terminal:toggle()
-end, { desc = "Toggle Lazygit" })
+    -- Create a new buffer and open lazygit
+    vim.cmd("enew")
+    local buf = vim.api.nvim_get_current_buf()
+    local chan = vim.fn.termopen("lazygit", {
+        on_exit = function(_, exit_code)
+            -- Schedule the buffer deletion to happen after lazygit exits
+            vim.schedule(function()
+                if vim.api.nvim_buf_is_valid(buf) then
+                    vim.api.nvim_buf_delete(buf, { force = true })
+                end
+            end)
+        end
+    })
+    -- Enter terminal mode to interact with lazygit
+    vim.cmd("startinsert")
+end, { desc = "Open Lazygit" })
 
 local opencode_terminal = TerminalClass:new({
     cmd = "opencode",
