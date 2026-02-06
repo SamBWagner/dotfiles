@@ -132,12 +132,24 @@ vim.lsp.enable("ts_ls")
 vim.lsp.enable("html")
 vim.lsp.enable("cssls")
 vim.lsp.enable("bicep")
+vim.lsp.enable("yamlls")
 
 require("fidget").setup()
 require("mason").setup()
 require("mason-lspconfig").setup({
-    ensure_installed = { "lua_ls", "ts_ls", "html", "cssls", "bicep" },
+    ensure_installed = { "lua_ls", "ts_ls", "html", "cssls", "bicep", "yamlls" },
     automatic_installation = true,
+})
+
+require("lspconfig").yamlls.setup({
+    settings = {
+        yaml = {
+            schemas = {
+                ["https://json.schemastore.org/github-workflow.json"] = "/.github/workflows/*",
+                ["https://json.schemastore.org/github-action.json"] = "/action.{yml,yaml}",
+            },
+        },
+    },
 })
 
 require("easy-dotnet").setup()
@@ -536,6 +548,7 @@ vim.api.nvim_set_hl(0, "Normal", { bg = "NONE" })
 vim.api.nvim_set_hl(0, "NormalFloat", { bg = "NONE" })
 vim.api.nvim_set_hl(0, "SignColumn", { bg = "NONE" })
 vim.api.nvim_set_hl(0, "NormalNC", { bg = "NONE" })
+vim.api.nvim_set_hl(0, "FloatBorder", { bg = "NONE" })
 
 local whichkey = require("which-key")
 whichkey.add({
