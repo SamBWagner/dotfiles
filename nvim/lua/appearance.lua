@@ -10,6 +10,8 @@ local function setup_transparent_background()
     vim.api.nvim_set_hl(0, "SignColumn", { bg = "NONE" })
     vim.api.nvim_set_hl(0, "NormalNC", { bg = "NONE" })
     vim.api.nvim_set_hl(0, "FloatBorder", { bg = "NONE" })
+    vim.api.nvim_set_hl(0, "StatusLine", { bg = "NONE" })
+    vim.api.nvim_set_hl(0, "StatusLineNC", { bg = "NONE" })
 end
 
 local function setup_which_key_labels()

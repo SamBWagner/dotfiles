@@ -1,5 +1,14 @@
 local M = {}
 
+function M.short_path()
+    local path = vim.fn.expand("%:~:.")
+    local parts = vim.split(path, "/", { plain = true })
+    if #parts <= 2 then
+        return path
+    end
+    return parts[#parts - 1] .. "/" .. parts[#parts]
+end
+
 function M.setup()
     vim.g.mapleader = " "
 
@@ -18,7 +27,8 @@ function M.setup()
     vim.o.signcolumn = "yes"
     vim.o.colorcolumn = "80"
     vim.o.showtabline = 0
-    vim.o.laststatus = 0
+    vim.o.laststatus = 2
+    vim.o.statusline = "%{%v:lua.require('options').short_path()%}"
 
     vim.diagnostic.config({
         signs = {
