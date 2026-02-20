@@ -67,7 +67,8 @@ local function setup_lsp_keymaps()
     vim.keymap.set("n", "grr", telescope.lsp_references, { desc = "Go to references" })
     vim.keymap.set("n", "grn", vim.lsp.buf.rename, { desc = "Rename symbol" })
     vim.keymap.set("n", "gca", vim.lsp.buf.code_action, { desc = "Code action" })
-    vim.keymap.set("n", "gdi", function() vim.diagnostic.open_float(nil, { border = "rounded" }) end, { desc = "Show diagnostic" })
+    vim.keymap.set("n", "gdi", function() vim.diagnostic.open_float(nil, { border = "rounded" }) end,
+        { desc = "Show diagnostic" })
     vim.keymap.set("n", "<leader>lf", function()
         if vim.bo.filetype == "cs" then
             local current_file_path = vim.fn.expand("%:p")
@@ -124,19 +125,20 @@ local function setup_terminal_keymaps()
         vim.cmd("startinsert")
     end, { desc = "Open Lazygit" })
 
-    local opencode_terminal = TerminalClass:new({
-        cmd = "opencode",
-        dir = vim.fn.getcwd(),
-        direction = "float",
-        float_opts = {
-            border = "curved",
-        },
-        hidden = true,
-    })
-
-    vim.keymap.set("n", "<leader>ai", function()
-        opencode_terminal:toggle()
-    end, { desc = "Toggle OpenCode" })
+    -- opencode.nvim keymaps
+    vim.keymap.set({ "n", "x" }, "<leader>aia", function() require("opencode").ask("@this: ", { submit = true }) end,
+        { desc = "AI ask" })
+    vim.keymap.set({ "n", "x" }, "<leader>ais", function() require("opencode").select() end,
+        { desc = "AI select action" })
+    vim.keymap.set({ "n", "t" }, "<leader>ait", function() require("opencode").toggle() end, { desc = "AI toggle" })
+    vim.keymap.set({ "n", "x" }, "go", function() return require("opencode").operator("@this ") end,
+        { desc = "AI send range", expr = true })
+    vim.keymap.set("n", "goo", function() return require("opencode").operator("@this ") .. "_" end,
+        { desc = "AI send line", expr = true })
+    vim.keymap.set("n", "<leader>aip", function() require("opencode").command("session.half.page.up") end,
+        { desc = "AI scroll up" })
+    vim.keymap.set("n", "<leader>ain", function() require("opencode").command("session.half.page.down") end,
+        { desc = "AI scroll down" })
 
     vim.keymap.set("n", "<leader>md", function()
         local current_file_path = vim.fn.expand("%:p")
@@ -164,7 +166,8 @@ local function setup_general_keymaps()
     vim.keymap.set("n", "N", "Nzzzv", { desc = "Previous search result (centered)" })
     vim.keymap.set({ "n", "v" }, "<leader>y", [["+y]], { desc = "Yank to clipboard" })
     vim.keymap.set("n", "Q", "<nop>", { desc = "Disable Ex mode" })
-    vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]], { desc = "Substitute word under cursor" })
+    vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]],
+        { desc = "Substitute word under cursor" })
     vim.keymap.set("v", "<", "<gv", { desc = "Indent left (keep selection)" })
     vim.keymap.set("v", ">", ">gv", { desc = "Indent right (keep selection)" })
 end

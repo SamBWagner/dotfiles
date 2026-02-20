@@ -21,6 +21,7 @@ local function install_plugins()
         { src = "https://github.com/tpope/vim-fugitive" },
         { src = "https://github.com/folke/which-key.nvim" },
         { src = "https://github.com/sphamba/smear-cursor.nvim" },
+        { src = "https://github.com/nickjvandyke/opencode.nvim" },
     })
 end
 
@@ -99,6 +100,13 @@ local function setup_smear_cursor()
     })
 end
 
+local function setup_opencode()
+    ---@type opencode.Opts
+    vim.g.opencode_opts = {}
+
+    vim.o.autoread = true -- Required for buffer reload on opencode edits
+end
+
 function M.setup()
     install_plugins()
     require("easy-dotnet").setup()
@@ -108,6 +116,7 @@ function M.setup()
     setup_which_key()
     setup_toggleterm()
     setup_smear_cursor()
+    setup_opencode()
 end
 
 return M
