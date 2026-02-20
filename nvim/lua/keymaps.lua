@@ -79,6 +79,22 @@ local function setup_lsp_keymaps()
                 vim.cmd("edit!")
                 vim.notify("Formatted with CSharpier", vim.log.levels.INFO)
             end
+        elseif vim.bo.filetype == "markdown" then
+            local current_file_path = vim.fn.expand("%:p")
+            vim.cmd("write")
+            local output = vim.fn.system({
+                "prettier",
+                "--write",
+                "--prose-wrap", "always",
+                "--print-width", "80",
+                current_file_path,
+            })
+            if vim.v.shell_error ~= 0 then
+                vim.notify("Prettier error:\n" .. output, vim.log.levels.ERROR)
+            else
+                vim.cmd("edit!")
+                vim.notify("Formatted with Prettier", vim.log.levels.INFO)
+            end
         else
             vim.lsp.buf.format()
         end

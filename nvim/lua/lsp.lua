@@ -7,12 +7,13 @@ local function enable_servers()
     vim.lsp.enable("cssls")
     vim.lsp.enable("bicep")
     vim.lsp.enable("yamlls")
+    vim.lsp.enable("powershell_es")
 end
 
 local function setup_mason()
     require("mason").setup()
     require("mason-lspconfig").setup({
-        ensure_installed = { "lua_ls", "ts_ls", "html", "cssls", "bicep", "yamlls" },
+        ensure_installed = { "lua_ls", "ts_ls", "html", "cssls", "bicep", "yamlls", "powershell_es" },
         automatic_installation = true,
     })
 end

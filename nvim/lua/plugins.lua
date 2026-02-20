@@ -20,6 +20,7 @@ local function install_plugins()
         { src = "https://github.com/lewis6991/gitsigns.nvim" },
         { src = "https://github.com/tpope/vim-fugitive" },
         { src = "https://github.com/folke/which-key.nvim" },
+        { src = "https://github.com/sphamba/smear-cursor.nvim" },
     })
 end
 
@@ -86,6 +87,18 @@ local function setup_toggleterm()
     })
 end
 
+local function setup_smear_cursor()
+    require("smear_cursor").setup({
+        smear_between_buffers = true,
+        smear_between_neighbor_lines = true,
+        scroll_buffer_space = true,
+        smear_insert_mode = true,
+        stiffness = 0.5,
+        trailing_stiffness = 0.5,
+        matrix_pixel_threshold = 0.5,
+    })
+end
+
 function M.setup()
     install_plugins()
     require("easy-dotnet").setup()
@@ -94,6 +107,7 @@ function M.setup()
     setup_gitsigns()
     setup_which_key()
     setup_toggleterm()
+    setup_smear_cursor()
 end
 
 return M
