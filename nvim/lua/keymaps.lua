@@ -108,8 +108,6 @@ local function setup_lsp_keymaps()
 end
 
 local function setup_terminal_keymaps()
-    local TerminalClass = require("toggleterm.terminal").Terminal
-
     vim.keymap.set("n", "<leader>gg", function()
         vim.cmd("enew")
         local buf = vim.api.nvim_get_current_buf()
@@ -146,15 +144,55 @@ local function setup_terminal_keymaps()
             vim.notify("Not a markdown file", vim.log.levels.WARN)
             return
         end
-        local glow_terminal = TerminalClass:new({
-            cmd = "glow " .. vim.fn.shellescape(current_file_path) .. " -p",
-            direction = "float",
-            float_opts = {
-                border = "curved",
-            },
-            close_on_exit = true,
+        if vim.fn.executable("glow") == 0 then
+            vim.notify("glow is not installed", vim.log.levels.ERROR)
+            return
+        end
+
+        local ok, err = pcall(vim.cmd, "update")
+        if not ok then
+            vim.notify("Unable to save markdown file:\n" .. err, vim.log.levels.ERROR)
+            return
+        end
+
+        vim.cmd("tabnew")
+        local preview_tab = vim.api.nvim_get_current_tabpage()
+        local preview_buf = vim.api.nvim_get_current_buf()
+
+        vim.bo[preview_buf].bufhidden = "wipe"
+        vim.bo[preview_buf].buflisted = false
+        vim.bo[preview_buf].swapfile = false
+        vim.wo.number = false
+        vim.wo.relativenumber = false
+        vim.wo.signcolumn = "no"
+
+        vim.keymap.set("t", "<Esc>", [[<C-\><C-n>]], { buffer = preview_buf, silent = true })
+        vim.keymap.set("n", "q", "<cmd>tabclose<cr>", { buffer = preview_buf, silent = true })
+
+        local job_id = vim.fn.termopen({ "glow", current_file_path, "-p" }, {
+            on_exit = function()
+                vim.schedule(function()
+                    if not vim.api.nvim_buf_is_valid(preview_buf) or not vim.api.nvim_tabpage_is_valid(preview_tab) then
+                        return
+                    end
+
+                    local wins = vim.fn.win_findbuf(preview_buf)
+                    for _, win in ipairs(wins) do
+                        if vim.api.nvim_win_is_valid(win) then
+                            vim.api.nvim_win_close(win, true)
+                        end
+                    end
+                end)
+            end,
         })
-        glow_terminal:toggle()
+
+        if job_id <= 0 then
+            vim.cmd("tabclose")
+            vim.notify("Failed to launch glow", vim.log.levels.ERROR)
+            return
+        end
+
+        vim.cmd("startinsert")
     end, { desc = "Preview markdown with glow" })
 end
 
