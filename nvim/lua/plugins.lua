@@ -50,50 +50,19 @@ local function patch_easy_dotnet_client_version()
 
     client._version_shim_applied = true
 
+    local create_rpc_call = client.create_rpc_call
+
     --- Easy Dotnet currently hard-codes an older client version in initialize.
-    --- Mirror the installed server version so startup keeps working until the plugin updates.
-    client._initialize = function(self, cb, opts)
-        opts = opts or {}
+    --- Patch only the outgoing version field so the plugin's own initialize flow stays intact.
+    client.create_rpc_call = function(opts)
+        local request = opts and opts.params and opts.params.request
+        local client_info = request and request.clientInfo
 
-        coroutine.wrap(function()
-            local use_visual_studio = require("easy-dotnet.options").options.server.use_visual_studio == true
-            local debugger_path = require("easy-dotnet.options").options.debugger.bin_path
-            local apply_value_converters = require("easy-dotnet.options").options.debugger.apply_value_converters
-            local sln_file = require("easy-dotnet.parsers.sln-parse").find_solution_file()
+        if opts and opts.method == "initialize" and client_info and client_info.name == "EasyDotnet" then
+            client_info.version = detect_easy_dotnet_server_version()
+        end
 
-            local debugger_options = {
-                applyValueConverters = apply_value_converters,
-                binaryPath = debugger_path,
-            }
-
-            return client.create_rpc_call({
-                client = self._client,
-                job = {
-                    name = "Initializing...",
-                    on_success_text = "Client initialized",
-                    on_error_text = "Failed to initialize server",
-                },
-                cb = cb,
-                on_crash = opts.on_crash,
-                method = "initialize",
-                params = {
-                    request = {
-                        clientInfo = {
-                            name = "EasyDotnet",
-                            version = detect_easy_dotnet_server_version(),
-                        },
-                        projectInfo = {
-                            rootDir = vim.fs.normalize(vim.fn.getcwd()),
-                            solutionFile = sln_file,
-                        },
-                        options = {
-                            useVisualStudio = use_visual_studio,
-                            debuggerOptions = debugger_options,
-                        },
-                    },
-                },
-            })()
-        end)()
+        return create_rpc_call(opts)
     end
 end
 
