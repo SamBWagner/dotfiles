@@ -19,13 +19,15 @@ function M.setup()
     vim.o.softtabstop = 4
     vim.o.expandtab = true
     vim.o.smartindent = true
+    vim.o.number = true
+    vim.o.relativenumber = true
 
     vim.o.hlsearch = false
     vim.o.incsearch = true
 
     vim.o.scrolloff = 10
     vim.o.signcolumn = "yes"
-    vim.o.colorcolumn = "80"
+    -- vim.o.colorcolumn = "80"
     vim.o.showtabline = 0
     vim.o.laststatus = 2
     vim.o.statusline = "%{%v:lua.require('options').short_path()%}"

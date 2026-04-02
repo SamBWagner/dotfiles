@@ -2,6 +2,7 @@ local M = {}
 
 local function install_plugins()
     vim.pack.add({
+        { src = "https://github.com/sitiom/nvim-numbertoggle" },
         { src = "https://github.com/sainnhe/sonokai" },
         { src = "https://github.com/akinsho/toggleterm.nvim" },
         { src = "https://github.com/nvim-treesitter/nvim-treesitter" },
@@ -21,8 +22,80 @@ local function install_plugins()
         { src = "https://github.com/tpope/vim-fugitive" },
         { src = "https://github.com/folke/which-key.nvim" },
         { src = "https://github.com/sphamba/smear-cursor.nvim" },
-        { src = "https://github.com/nickjvandyke/opencode.nvim" },
     })
+end
+
+local function trim(value)
+    return vim.trim(value or "")
+end
+
+local function detect_easy_dotnet_server_version()
+    if vim.fn.executable("dotnet") == 0 then
+        return "2.0.0"
+    end
+
+    local result = vim.system({ "dotnet", "easydotnet", "-v" }, { text = true }):wait()
+    if result.code ~= 0 then
+        return "2.0.0"
+    end
+
+    local version = trim(result.stdout):match("%d+%.%d+%.%d+%.?%d*")
+    return version or "2.0.0"
+end
+
+local function patch_easy_dotnet_client_version()
+    local ok, client = pcall(require, "easy-dotnet.rpc.dotnet-client")
+    if not ok or client._version_shim_applied then
+        return
+    end
+
+    client._version_shim_applied = true
+
+    --- Easy Dotnet currently hard-codes an older client version in initialize.
+    --- Mirror the installed server version so startup keeps working until the plugin updates.
+    client._initialize = function(self, cb, opts)
+        opts = opts or {}
+
+        coroutine.wrap(function()
+            local use_visual_studio = require("easy-dotnet.options").options.server.use_visual_studio == true
+            local debugger_path = require("easy-dotnet.options").options.debugger.bin_path
+            local apply_value_converters = require("easy-dotnet.options").options.debugger.apply_value_converters
+            local sln_file = require("easy-dotnet.parsers.sln-parse").find_solution_file()
+
+            local debugger_options = {
+                applyValueConverters = apply_value_converters,
+                binaryPath = debugger_path,
+            }
+
+            return client.create_rpc_call({
+                client = self._client,
+                job = {
+                    name = "Initializing...",
+                    on_success_text = "Client initialized",
+                    on_error_text = "Failed to initialize server",
+                },
+                cb = cb,
+                on_crash = opts.on_crash,
+                method = "initialize",
+                params = {
+                    request = {
+                        clientInfo = {
+                            name = "EasyDotnet",
+                            version = detect_easy_dotnet_server_version(),
+                        },
+                        projectInfo = {
+                            rootDir = vim.fs.normalize(vim.fn.getcwd()),
+                            solutionFile = sln_file,
+                        },
+                        options = {
+                            useVisualStudio = use_visual_studio,
+                            debuggerOptions = debugger_options,
+                        },
+                    },
+                },
+            })()
+        end)()
+    end
 end
 
 local function setup_treesitter()
@@ -100,15 +173,9 @@ local function setup_smear_cursor()
     })
 end
 
-local function setup_opencode()
-    ---@type opencode.Opts
-    vim.g.opencode_opts = {}
-
-    vim.o.autoread = true -- Required for buffer reload on opencode edits
-end
-
 function M.setup()
     install_plugins()
+    patch_easy_dotnet_client_version()
     require("easy-dotnet").setup()
     setup_treesitter()
     require("ibl").setup()
@@ -116,7 +183,6 @@ function M.setup()
     setup_which_key()
     setup_toggleterm()
     setup_smear_cursor()
-    setup_opencode()
 end
 
 return M

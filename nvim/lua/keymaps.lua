@@ -123,21 +123,6 @@ local function setup_terminal_keymaps()
         vim.cmd("startinsert")
     end, { desc = "Open Lazygit" })
 
-    -- opencode.nvim keymaps
-    vim.keymap.set({ "n", "x" }, "<leader>aia", function() require("opencode").ask("@this: ", { submit = true }) end,
-        { desc = "AI ask" })
-    vim.keymap.set({ "n", "x" }, "<leader>ais", function() require("opencode").select() end,
-        { desc = "AI select action" })
-    vim.keymap.set({ "n", "t" }, "<leader>ait", function() require("opencode").toggle() end, { desc = "AI toggle" })
-    vim.keymap.set({ "n", "x" }, "go", function() return require("opencode").operator("@this ") end,
-        { desc = "AI send range", expr = true })
-    vim.keymap.set("n", "goo", function() return require("opencode").operator("@this ") .. "_" end,
-        { desc = "AI send line", expr = true })
-    vim.keymap.set("n", "<leader>aip", function() require("opencode").command("session.half.page.up") end,
-        { desc = "AI scroll up" })
-    vim.keymap.set("n", "<leader>ain", function() require("opencode").command("session.half.page.down") end,
-        { desc = "AI scroll down" })
-
     vim.keymap.set("n", "<leader>md", function()
         local current_file_path = vim.fn.expand("%:p")
         if vim.bo.filetype ~= "markdown" then
