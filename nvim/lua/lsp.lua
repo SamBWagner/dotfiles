@@ -1,33 +1,45 @@
 local M = {}
 
-local function enable_servers()
-    vim.lsp.enable("lua_ls")
-    vim.lsp.enable("ts_ls")
-    vim.lsp.enable("html")
-    vim.lsp.enable("cssls")
-    vim.lsp.enable("bicep")
-    vim.lsp.enable("yamlls")
-    vim.lsp.enable("powershell_es")
-end
+local servers = {
+    "lua_ls",
+    "ts_ls",
+    "html",
+    "cssls",
+    "bicep",
+    "yamlls",
+    "powershell_es",
+}
 
-local function setup_mason()
-    require("mason").setup()
-    require("mason-lspconfig").setup({
-        ensure_installed = { "lua_ls", "ts_ls", "html", "cssls", "bicep", "yamlls", "powershell_es" },
-        automatic_installation = true,
+local function setup_server_configs()
+    vim.lsp.config("*", {
+        capabilities = require("cmp_nvim_lsp").default_capabilities(),
     })
-end
 
-local function setup_yaml_schema()
-    require("lspconfig").yamlls.setup({
+    vim.lsp.config("yamlls", {
         settings = {
+            redhat = {
+                telemetry = {
+                    enabled = false,
+                },
+            },
             yaml = {
+                format = {
+                    enable = true,
+                },
                 schemas = {
                     ["https://json.schemastore.org/github-workflow.json"] = "/.github/workflows/*",
                     ["https://json.schemastore.org/github-action.json"] = "/action.{yml,yaml}",
                 },
             },
         },
+    })
+end
+
+local function setup_mason()
+    require("mason").setup()
+    require("mason-lspconfig").setup({
+        ensure_installed = servers,
+        automatic_enable = servers,
     })
 end
 
@@ -75,10 +87,9 @@ local function setup_completion()
 end
 
 function M.setup()
-    enable_servers()
     require("fidget").setup()
+    setup_server_configs()
     setup_mason()
-    setup_yaml_schema()
     setup_completion()
 end
 

@@ -5,7 +5,6 @@ local function install_plugins()
         { src = "https://github.com/sitiom/nvim-numbertoggle" },
         { src = "https://github.com/sainnhe/sonokai" },
         { src = "https://github.com/akinsho/toggleterm.nvim" },
-        { src = "https://github.com/nvim-treesitter/nvim-treesitter" },
         { src = "https://github.com/nvim-telescope/telescope.nvim" },
         { src = "https://github.com/nvim-lua/plenary.nvim" },
         { src = "https://github.com/neovim/nvim-lspconfig" },
@@ -98,17 +97,6 @@ local function patch_easy_dotnet_client_version()
     end
 end
 
-local function setup_treesitter()
-    require("nvim-treesitter.configs").setup({
-        sync_install = false,
-        auto_install = true,
-        highlight = {
-            enable = true,
-            additional_vim_regex_highlighting = false,
-        },
-    })
-end
-
 local function setup_gitsigns()
     require("gitsigns").setup({
         signs = {
@@ -177,7 +165,6 @@ function M.setup()
     install_plugins()
     patch_easy_dotnet_client_version()
     require("easy-dotnet").setup()
-    setup_treesitter()
     require("ibl").setup()
     setup_gitsigns()
     setup_which_key()

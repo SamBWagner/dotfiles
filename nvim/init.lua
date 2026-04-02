@@ -1,6 +1,6 @@
+require("plugins").setup()
 require("options").setup()
 require("autocmds").setup()
-require("plugins").setup()
 require("lsp").setup()
 require("keymaps").setup()
 require("git").setup()
